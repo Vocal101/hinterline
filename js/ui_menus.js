@@ -207,7 +207,7 @@
     const gg = g(); if (!gg) return;
     const el = document.getElementById('st-news');
     if (el) el.innerHTML = `<b>${HL.fmtDate(n.date)}</b>${esc(n.title)}`;
-    if (!n.big || !HL.Meta.settings.newspaper || HL.G.fastForward) return;
+    if (!n.big || !HL.Meta.settings.newspaper || HL.G.fastForward || gg.demo) return;
     const p = document.getElementById('paper');
     const yr = HL.ymd(n.date).y;
     const mast = yr < 1950 ? 'The Hinterland Gazette' : yr < 2000 ? 'Hinterland Evening Post' : 'Hinterline News';

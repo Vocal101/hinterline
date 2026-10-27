@@ -121,9 +121,15 @@
     UI.front(id);
     UI.render(id);
     clampWin(w);
+    // on short screens lift a tall window so its bottom (often the main buttons) is on screen
+    const hb = w.el.getBoundingClientRect();
+    if (hb.bottom > innerHeight - 8) w.el.style.top = Math.max(52, innerHeight - hb.height - 8) + 'px';
+    syncMenu();
     if (HL.Audio) HL.Audio.ui('open');
     return w;
   };
+  // the title menu steps back (card hidden, shade under the windows) while a window opened from it is up
+  function syncMenu() { const m = document.getElementById('menu'); if (m) m.classList.toggle('sub', UI.wins.size > 0); }
   UI.isOpen = id => UI.wins.has(id);
   UI.close = function (id) {
     const w = UI.wins.get(id); if (!w) return;
@@ -131,6 +137,7 @@
     posMemory[w.o.posKey || id] = [r.left, r.top];
     if (w.o.onClose) w.o.onClose(w);
     w.el.remove(); UI.wins.delete(id);
+    syncMenu();
     if (HL.Audio) HL.Audio.ui('close');
   };
   UI.closeAll = function (keep) { for (const id of Array.from(UI.wins.keys())) if (!keep || !keep(id)) UI.close(id); };
