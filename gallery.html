@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Hinterline art gallery</title>
+<style>body{margin:0;background:#7c9a5a;font:12px sans-serif;color:#111}h2{margin:10px;font:600 16px sans-serif}.grid{display:flex;flex-wrap:wrap;gap:6px;padding:6px}.cell{background:#86a462;border-radius:3px;text-align:center}.cell div{padding:2px}</style></head>
+<body>
+<script src="js/core.js"></script><script src="js/data_cargo.js"></script><script src="js/data_vehicles.js"></script><script src="js/world.js"></script><script src="js/game.js"></script><script src="js/gfx.js"></script><script src="js/art_build.js"></script><script src="js/render.js"></script><script src="js/vis.js"></script>
+<script>
+HL.Gfx.forceDom = true;
+const qs = new URLSearchParams(location.search), what = qs.get('w') || 'ind', climate = qs.get('c') || 'temperate', S = +(qs.get('s') || 1.4);
+function cell(title, m, w, h, opt) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const b = m.bounds(S, opt || {});
+  m.draw(c.getContext('2d'), S, (w - (b.x1 - b.x0)) / 2 - b.x0, (h - (b.y1 - b.y0)) / 2 - b.y0, opt || {});
+  const d = document.createElement('div'); d.className = 'cell'; d.appendChild(c); const t = document.createElement('div'); t.textContent = title; d.appendChild(t);
+  grid.appendChild(d);
+}
+const grid = document.createElement('div'); grid.className = 'grid'; document.body.appendChild(grid);
+if (what === 'ind') for (const id of HL.INDUSTRY_IDS) { const a = HL.Art.industry(id, 1, climate, qs.get('snow') === '1'); cell(id, a.m, Math.round(400 * S), Math.round(300 * S)); }
+if (what === 'house') for (let style = 0; style < 5; style++) for (let tier = 0; tier < 6; tier++) cell('t' + tier + ' s' + style, HL.Art.house(tier, style, (tier * 7 + style * 3) % 32, climate, qs.get('snow') === '1'), 150, 240);
+if (what === 'special') for (const id of ['townhall', 'church', 'market', 'hospital', 'stadium']) cell(id, HL.Art.special(id, 1, climate, false), 200, 220);
+if (what === 'veh') { const liv = HL.LIVERY[+(qs.get('l') || 0)]; for (const m of Object.values(HL.VEH)) { if (m.wagon && m.gen !== +(qs.get('gen') || 0)) continue; cell(m.name, HL.Vis.buildModel('k', m.art, m.len, liv, { gen: m.gen, fill: 2, cargo: m.cargo, body: m.body }), 170, 110, { yaw: -0.45 }); } }
+</script></body></html>

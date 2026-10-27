@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hinterline</title>
+  <meta name="description" content="A transport tycoon game: build railways, roads, shipping lanes and airlines across a procedurally generated country.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%237a2531'/%3E%3Crect x='3' y='3' width='26' height='26' rx='3' fill='none' stroke='%23c9a24e' stroke-width='1.5'/%3E%3Cpath d='M10 7l-3 18M22 7l3 18M8.5 12h15M8 17.5h16M7.3 22.5h17.4' stroke='%23ece5d3' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="map" aria-label="Game map"></canvas>
+  <div id="toolbar" class="lined"></div>
+  <div id="status"></div>
+  <div id="ui"></div>
+  <div id="goals" class="lined"></div>
+  <div id="tutor" class="lined"></div>
+  <div id="paper"></div>
+  <div id="menu"></div>
+  <div id="toasts"></div>
+  <div id="tip"></div>
+  <div id="cost"></div>
+  <div id="loading" class="loading"><div>Hinterline<small>Laying the first sleepers…</small></div></div>
+  <script src="js/core.js"></script>
+  <script src="js/data_cargo.js"></script>
+  <script src="js/data_vehicles.js"></script>
+  <script src="js/data_names.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/mapgen.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/build.js"></script>
+  <script src="js/stations.js"></script>
+  <script src="js/towns.js"></script>
+  <script src="js/industries.js"></script>
+  <script src="js/econ.js"></script>
+  <script src="js/veh_core.js"></script>
+  <script src="js/rail.js"></script>
+  <script src="js/road.js"></script>
+  <script src="js/water_air.js"></script>
+  <script src="js/ai_build.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/save.js"></script>
+  <script src="js/meta.js"></script>
+  <script src="js/gfx.js"></script>
+  <script src="js/art_build.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/render_world.js"></script>
+  <script src="js/vis.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ui_core.js"></script>
+  <script src="js/ui_tools.js"></script>
+  <script src="js/ui_windows.js"></script>
+  <script src="js/ui_panels.js"></script>
+  <script src="js/ui_menus.js"></script>
+  <script src="js/tutorial.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/dev.js"></script>
+  <script>addEventListener('load', () => HL.G.boot());</script>
+</body>
+</html>
