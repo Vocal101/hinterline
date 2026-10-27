@@ -216,8 +216,33 @@ table.tt tr.total td { border-top: 1px solid var(--gold-line); font-weight: 600;
 #tutor p { margin: 0 0 8px; font-size: 13.5px; }
 #tutor .step { font: 600 12px var(--f-num); color: var(--ink-faint); letter-spacing: 0.08em; }
 #tutor .done { color: var(--good); }
+#tutor { max-height: calc(100vh - 120px); overflow-y: auto; }
+#tutor.min { width: 240px; padding: 8px 12px 6px; }
+#tutor.min h4 { font-size: 14px; margin: 2px 0 0; }
+.tut-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tut-head .wbtn { width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 2px; background: var(--panel-2); color: var(--ink); padding: 0; font: 600 15px/1 var(--f-num); flex: none; }
+.tut-head .wbtn:hover { border-color: var(--gold-line); }
+#tutor .pips { display: flex; gap: 4px; margin: 6px 0 9px; }
+#tutor .pips i { height: 3px; flex: 1; background: var(--line); border-radius: 1px; }
+#tutor .pips i.did { background: var(--gold); }
+#tutor .pips i.cur { background: var(--gold-2); }
+.tut-text { font-size: 13.5px; line-height: 1.5; }
+.tut-text ul, #tipcard ul { margin: 6px 0 0; padding-left: 18px; }
+.tut-text li { margin: 2px 0; }
+#tutor .checks { list-style: none; margin: 10px 0 0; padding: 8px 10px; background: rgba(0, 0, 0, 0.18); border: 1px solid var(--line); border-radius: var(--r); font-size: 13px; }
+#tutor .checks li { position: relative; padding-left: 22px; margin: 3px 0; color: var(--ink); }
+#tutor .checks li::before { content: ''; position: absolute; left: 2px; top: 3px; width: 11px; height: 11px; border: 1.5px solid var(--ink-faint); border-radius: 2px; }
+#tutor .checks li.ok { color: var(--ink-dim); }
+#tutor .checks li.ok::before { border-color: var(--good); background: var(--good); box-shadow: inset 0 0 0 2px var(--panel); }
+#tutor .tut-status { margin: 8px 0 0; font-size: 12.5px; color: var(--gold-2); }
+#tipcard { position: fixed; right: 14px; bottom: 46px; width: 320px; z-index: 55; display: none; padding: 12px 14px; }
+#tipcard .step { font: 600 12px var(--f-num); color: var(--gold-2); letter-spacing: 0.1em; }
+#tipcard h4 { margin: 2px 0 6px; font: 600 16px var(--f-num); letter-spacing: 0.03em; }
+#tipcard p { margin: 0 0 10px; font-size: 13px; line-height: 1.5; }
+@media (max-width: 560px) { #tutor, #tipcard { left: 8px; right: 8px; width: auto; } }
 .hl { outline: 2px solid var(--gold-2) !important; outline-offset: 2px; animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { outline-color: rgba(230, 196, 114, 0.25); } }
+#status.hl, #toolbar.hl { outline-offset: -3px; }
 
 /* goals strip */
 #goals { position: fixed; left: 12px; top: 64px; z-index: 35; padding: 10px 12px 10px; width: 250px; display: none; font-size: 12.5px; }

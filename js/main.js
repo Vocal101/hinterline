@@ -71,6 +71,7 @@
     const big = g.towns.filter(Boolean).sort((a, b) => b.pop - a.pop)[0];
     G.snapTo(big ? big.x : g.map.W / 2, big ? big.y : g.map.H / 2);
     R.cam.z = G.zoomTarget = 1;
+    if (HL.Tips) { HL.Tips.reset(); if (fresh) setTimeout(() => { if (G.g === g) HL.Tips.show('start'); }, 2500); }
     if (fresh) HL.Game.news(g, 'company', c.name + ' is founded', `${c.manager} opens an office in ${big ? big.name : 'the hinterland'} with ${HL.fmtMoney(c.money)} of borrowed money. ${g.scenario ? 'Scenario: ' + g.scenario.name + '.' : 'Make it count.'}`, { big: true });
   };
   G.loadSlot = async function (slot) {
@@ -170,7 +171,7 @@
     try { R.frame(now); } catch (e) { console.error(e); }
     if (now - uiT > 250) {
       uiT = now;
-      if (!g.demo) { UI.updateStatus(); UI.refreshAll(); UI.updateGoals(); if (HL.Tutorial.active) HL.Tutorial.tick(); }
+      if (!g.demo) { UI.updateStatus(); UI.refreshAll(); UI.updateGoals(); if (HL.Tutorial.active) HL.Tutorial.tick(); else HL.Tips.tick(); }
     }
     if (now - ambT > 900) { ambT = now; ambientView(); }
     if (now - achT > 3000 && !g.demo) { achT = now; HL.Meta.check(g); }

@@ -509,13 +509,13 @@
         const rng = (k, label) => row(label, `<input type="range" min="0" max="100" value="${Math.round(s[k] * 100)}" data-c="${k}" style="width:100%">`);
         const chk = (k, label) => `<label class="chk"><input type="checkbox" data-c="${k}" ${s[k] ? 'checked' : ''}> ${label}</label>`;
         let h = `<h3>Sound</h3><div class="form">${rng('vol', 'Master')}${rng('sfx', 'Effects')}${rng('ambient', 'Ambience')}${rng('music', 'Music')}</div>
-          <h3>Display</h3><div style="display:grid;gap:6px">${chk('dayNight', 'Day and night cycle')}${chk('weather', 'Weather (rain, snow, storms)')}${chk('grid', 'Tile grid lines')}${chk('townNames', 'Town names')}${chk('stationNames', 'Station signs')}${chk('industryNames', 'Industry names when zoomed in')}${chk('edgeScroll', 'Scroll at screen edges')}${chk('newspaper', 'Pop-up newspaper for big news')}</div>
+          <h3>Display</h3><div style="display:grid;gap:6px">${chk('dayNight', 'Day and night cycle')}${chk('weather', 'Weather (rain, snow, storms)')}${chk('grid', 'Tile grid lines')}${chk('townNames', 'Town names')}${chk('stationNames', 'Station signs')}${chk('industryNames', 'Industry names when zoomed in')}${chk('edgeScroll', 'Scroll at screen edges')}${chk('newspaper', 'Pop-up newspaper for big news')}${chk('tips', 'Beginner tips')}</div>
           <h3>Game</h3><div class="form">${row('Autosave', `<select data-c="autosave">${[['0', 'Off'], ['1', 'Every month'], ['3', 'Every 3 months'], ['6', 'Every 6 months'], ['12', 'Every year']].map(([v, l]) => `<option value="${v}" ${String(s.autosave) === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`)}</div>`;
         if (gg) h += `<div style="display:grid;gap:6px;margin-top:8px"><label class="chk"><input type="checkbox" data-c="g_crash" ${gg.diff.crashes ? 'checked' : ''}> Trains can collide (no collisions: they brake for each other)</label><label class="chk"><input type="checkbox" data-c="g_brk" ${gg.diff.breakdowns ? 'checked' : ''}> Vehicle breakdowns</label><label class="chk"><input type="checkbox" data-c="g_infl" ${gg.diff.inflation ? 'checked' : ''}> Inflation</label></div>`;
         return h;
       },
       actions: Object.assign({}, ...['vol', 'sfx', 'ambient', 'music'].map(k => ({ [k]: (v) => { HL.Meta.settings[k] = v / 100; HL.Meta.save(); if (HL.Audio) HL.Audio.applyVolumes(); } })),
-        ...['dayNight', 'weather', 'grid', 'townNames', 'stationNames', 'industryNames', 'edgeScroll', 'newspaper'].map(k => ({ [k]: (v) => { HL.Meta.settings[k] = v; HL.Meta.save(); HL.G.applySettings(); } })),
+        ...['dayNight', 'weather', 'grid', 'townNames', 'stationNames', 'industryNames', 'edgeScroll', 'newspaper', 'tips'].map(k => ({ [k]: (v) => { HL.Meta.settings[k] = v; HL.Meta.save(); HL.G.applySettings(); } })),
         { autosave: (v) => { HL.Meta.settings.autosave = +v; HL.Meta.save(); }, g_crash: (v) => { g().diff.crashes = v; }, g_brk: (v) => { g().diff.breakdowns = v ? 2 : 0; }, g_infl: (v) => { g().diff.inflation = v; } }),
     });
   };

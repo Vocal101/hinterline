@@ -20,7 +20,7 @@ Optional local server: `python -m http.server 8771` in this folder, then visit h
 
 ## How to play
 
-- **Start with the Tutorial** on the title screen. It walks you through a coal railway from the first station to the first delivery.
+- **Start with the Tutorial** on the title screen. In five short parts it shows you around the screen, explains how money is made, and walks you through your first coal railway and a bus line. After that, beginner tips pop up when something new comes up; you can turn them off in Settings.
 - Money comes from carrying cargo. You're paid by distance and by how quickly it arrives, so long, fast routes pay best.
 - Raw materials (coal, ore, grain, timber, oil) go to industries that accept them, which then produce goods for towns. Towns produce passengers and mail.
 - A station only receives cargo once one of your vehicles has called there to load. The blue shading when you place a station shows its catchment.

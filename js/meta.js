@@ -3,7 +3,7 @@
   const HL = root.HL;
   const Meta = HL.Meta = {};
   const KEY = 'hinterline_profile_v1';
-  const DEFAULTS = { vol: 0.8, sfx: 0.8, ambient: 0.55, music: 0.45, dayNight: true, weather: true, grid: true, townNames: true, stationNames: true, industryNames: false, edgeScroll: false, newspaper: true, autosave: 3 };
+  const DEFAULTS = { vol: 0.8, sfx: 0.8, ambient: 0.55, music: 0.45, dayNight: true, weather: true, grid: true, townNames: true, stationNames: true, industryNames: false, edgeScroll: false, newspaper: true, autosave: 3, tips: true };
   Meta.settings = Object.assign({}, DEFAULTS);
   Meta.ach = {};
   Meta.scores = [];
@@ -15,12 +15,12 @@
     try {
       const d = JSON.parse(s.getItem(KEY) || '{}');
       Object.assign(Meta.settings, d.settings || {});
-      Meta.ach = d.ach || {}; Meta.scores = d.scores || []; Meta.tutorialDone = !!d.tutorialDone; Meta.scenariosWon = d.scenariosWon || {};
+      Meta.ach = d.ach || {}; Meta.scores = d.scores || []; Meta.tutorialDone = !!d.tutorialDone; Meta.tipsSeen = d.tipsSeen || {}; Meta.scenariosWon = d.scenariosWon || {};
     } catch (e) { /* corrupt profile: start fresh */ }
   };
   Meta.save = function () {
     const s = store(); if (!s) return;
-    try { s.setItem(KEY, JSON.stringify({ settings: Meta.settings, ach: Meta.ach, scores: Meta.scores, tutorialDone: Meta.tutorialDone, scenariosWon: Meta.scenariosWon })); } catch (e) { /* storage full or blocked */ }
+    try { s.setItem(KEY, JSON.stringify({ settings: Meta.settings, ach: Meta.ach, scores: Meta.scores, tutorialDone: Meta.tutorialDone, tipsSeen: Meta.tipsSeen, scenariosWon: Meta.scenariosWon })); } catch (e) { /* storage full or blocked */ }
   };
 
   // ---------- achievements ----------

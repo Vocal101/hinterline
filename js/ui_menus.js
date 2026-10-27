@@ -75,7 +75,14 @@
         go: () => {
           const sz = SIZES[NG.size];
           UI.close('newgame');
-          HL.G.newGame({ climate: NG.climate, w: sz[0], h: sz[1], terrain: +NG.terrain, sea: +NG.sea, towns: +NG.towns, industries: +NG.industries, startYear: +NG.startYear, difficulty: NG.difficulty, aiCount: +NG.aiCount, seed: (NG.seed || HL.randomSeedString()).toUpperCase(), companyName: NG.name || 'Hinterline Transport', color: NG.color, townGrowth: +NG.townGrowth });
+          const found = () => HL.G.newGame({ climate: NG.climate, w: sz[0], h: sz[1], terrain: +NG.terrain, sea: +NG.sea, towns: +NG.towns, industries: +NG.industries, startYear: +NG.startYear, difficulty: NG.difficulty, aiCount: +NG.aiCount, seed: (NG.seed || HL.randomSeedString()).toUpperCase(), companyName: NG.name || 'Hinterline Transport', color: NG.color, townGrowth: +NG.townGrowth });
+          // first time founding a company without the tutorial: offer it once
+          const seen = HL.Meta.tipsSeen || (HL.Meta.tipsSeen = {});
+          if (!HL.Meta.tutorialDone && !seen.tutorialOffer) {
+            seen.tutorialOffer = true; HL.Meta.save();
+            return UI.confirm('New to Hinterline?', 'There is a lot going on in a transport tycoon. The tutorial walks you through the screen, how money is made, your first railway and a bus line, one small step at a time. It takes about fifteen minutes.', () => HL.Tutorial.start(), { yes: 'Play the tutorial', no: 'Skip, start my game', onNo: found });
+          }
+          found();
         },
         ...Object.fromEntries(['size', 'terrain', 'sea', 'towns', 'industries', 'difficulty', 'aiCount', 'townGrowth'].map(k => [k, (v) => { NG[k] = isNaN(+v) ? v : +v; }])),
         startYear: (v) => { NG.startYear = +v; },

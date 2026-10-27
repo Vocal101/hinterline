@@ -256,7 +256,7 @@
     UI.open('confirm', {
       title, w: 360, live: false,
       render: () => `<p class="lede" style="color:var(--ink)">${text}</p><div class="row" style="justify-content:flex-end">${UI.btn(o.no || 'Cancel', 'no')}${UI.btn(o.yes || 'OK', 'yes', { cls: 'primary' })}</div>`,
-      actions: { yes: () => { UI.close('confirm'); ok(); }, no: () => UI.close('confirm') },
+      actions: { yes: () => { UI.close('confirm'); ok(); }, no: () => { UI.close('confirm'); if (o.onNo) o.onNo(); } },
     });
   };
   UI.helpPopup = function (text) { UI.open('help-pop', { title: 'Help', w: 360, live: false, render: () => `<div style="font-size:13.5px;line-height:1.55">${text}</div>` }); };
