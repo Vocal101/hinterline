@@ -428,6 +428,7 @@
     if (!opts.length) { v.routeEnd = 'dead'; return; }
     const r = Rail.findRoute(g, v, opts, tgt);
     if (r) { v.route = r; v.lostSince = 0; return; }
+    if (tgt.kind === 'depot' && V().depotUnreachable(g, v)) { Rail.plan(g, v); return; }
     v.lostSince = v.lostSince || g.date;
     if (g.date - v.lostSince > 60 && !v.lostNews && v.owner === g.player) { v.lostNews = true; HL.Game.news(g, 'advice', V().displayName(v) + ' is lost', 'It can\'t find a route to its next destination. Check the track and its orders.', { veh: v.id, cid: v.owner }); }
   };

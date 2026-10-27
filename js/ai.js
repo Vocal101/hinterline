@@ -422,6 +422,25 @@
   };
 
   // ---------- fleet management ----------
+  // pick successors for models that are about to go out of production, so autorenew keeps working
+  AI.planReplacements = function (g, c, mine) {
+    const yr = HL.ymd(g.date).y;
+    const rep = c.replace || (c.replace = {});
+    c.renewReserve = 30000 * g.econ.costMul; // never renew our way into the red
+    const seen = new Set();
+    for (const v of mine) {
+      if (seen.has(v.model) || rep[v.model]) continue;
+      seen.add(v.model);
+      const m = HL.VEH[v.model];
+      if (yr < m.intro + m.life + 5) continue;
+      let nm = null;
+      if (v.kind === 'road') nm = AB().bestRoadVeh(g, m.cargo);
+      else if (v.kind === 'rail') nm = AB().bestEngine(g, c.id, m.rt, v.holds.some(h => h.c && h.c !== 'pax' && h.c !== 'mail'));
+      else if (v.kind === 'ship') nm = AB().bestShip(g, v.holds[0] ? v.holds[0].c : m.cargo);
+      else if (v.kind === 'air') nm = AB().bestPlane(g, m.size, !!m.heli);
+      if (nm && nm.id !== m.id) rep[m.id] = nm.id;
+    }
+  };
   AI.manageVehicles = function (g, c) {
     const mine = g.vehicles.filter(v => v && v.owner === c.id);
     // sell what's been sent home
@@ -433,7 +452,10 @@
       }
       // stuck crashed or lost for ages
       if (v.lostSince && g.date - v.lostSince > 400 && !v.aiSell) { v.aiSell = true; V().sendToDepot(g, v, true); }
+      // sent home but no depot can be reached any more: scrap it where it stands
+      else if (v.aiSell && v.lostSince && g.date - v.lostSince > 365 && !v.inDepot && v.kind !== 'air') { Game.earn(g, c.id, 'newveh', V().sellValue(v)); V().destroy(g, v, true); }
     }
+    AI.planReplacements(g, c, mine);
     // grow busy routes
     for (const p of c.ai.projects) {
       if (p.dead) continue;

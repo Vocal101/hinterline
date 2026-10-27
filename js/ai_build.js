@@ -302,7 +302,7 @@
       const k = m.type[t];
       if (k === T.ROAD) {
         const rb = m.road[t]; if (rb !== 5 && rb !== 10) continue;
-        if (m.rowner[t] !== cid && m.rowner[t] !== HL.OWNER_TOWN) continue;
+        if (m.rowner[t] !== cid && m.rowner[t] !== HL.OWNER_TOWN && m.rowner[t] !== HL.OWNER_NONE) continue;
         if (m.m1[t] & 0xC000) continue;
       } else if (k !== T.CLEAR) continue;
       if (x >= rect.x0 && x <= rect.x1 && y >= rect.y0 && y <= rect.y1) continue;

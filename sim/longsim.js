@@ -5,7 +5,8 @@ const errors = [];
 const oe = console.error; console.error = (...a) => { errors.push(a.join(' ')); if (errors.length < 6) oe(...a); };
 const t0 = Date.now();
 const g = HL.Game.create({ w: size, h: size, seed, climate, startYear: +(process.argv[7] || 1930), aiCount: ais, difficulty: 'normal' });
-g.companies[g.player].alive = true;
+// the empty player slot would go broke on loan interest and end the game; keep it out of the way
+g.companies[g.player].alive = false; g.endYear = 99999; g.continueAfterEnd = true;
 console.log('world', size, climate, 'towns', g.towns.length, 'industries', g.industries.filter(Boolean).length, 'gen ms', Date.now() - t0);
 function check(day) {
   const bad = [];
@@ -39,5 +40,7 @@ for (let day = 0; day < years * 365; day++) {
   }
 }
 check('end');
+if (g.over) errors.push('game ended early at ' + HL.ymd(g.date).y);
+console.log('final year', HL.ymd(g.date).y);
 console.log('done', years, 'years in', ((Date.now() - t0) / 1000).toFixed(1), 's; errors', errors.length);
 if (errors.length) { console.log(errors.slice(0, 10).join('\n')); process.exit(1); }

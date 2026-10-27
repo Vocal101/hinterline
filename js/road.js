@@ -325,6 +325,7 @@
     const opts = Road.next(g, v, v.seg, tgt);
     const r = Road.findRoute(g, v, opts, tgt);
     if (r) { v.route = r; v.lostSince = 0; return; }
+    if (tgt.kind === 'depot' && V().depotUnreachable(g, v)) { v.route = null; return; }
     v.noPathUntil = g.ticks + TPD;
     v.lostSince = v.lostSince || g.date;
     if (g.date - v.lostSince > 45 && !v.lostNews && v.owner === g.player) { v.lostNews = true; HL.Game.news(g, 'advice', V().displayName(v) + ' is lost', 'It can\'t find a road to its next destination.', { veh: v.id, cid: v.owner }); }

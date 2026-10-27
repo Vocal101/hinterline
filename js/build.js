@@ -106,8 +106,8 @@
       }
       case T.ROAD: {
         const head = B.bridgeOrTunnelAt(g, t);
-        if (head) { if (head.owner !== cid) return ERR('Owned by ' + ownerName(g, head.owner)); return B.removeBridgeOrTunnel(g, cid, head, exec); }
-        if (m.owner[t] !== cid && m.rowner[t] !== cid) return ERR('Owned by ' + ownerName(g, m.rowner[t]));
+        if (head) { if (head.owner !== cid && head.owner !== HL.OWNER_NONE) return ERR('Owned by ' + ownerName(g, head.owner)); return B.removeBridgeOrTunnel(g, cid, head, exec); }
+        if (m.owner[t] !== cid && m.rowner[t] !== cid && m.rowner[t] !== HL.OWNER_NONE) return ERR('Owned by ' + ownerName(g, m.rowner[t]));
         return B.removeRoad(g, cid, x, y, m.road[t], exec);
       }
       case T.STATION: return HL.Stations.removeTile(g, cid, x, y, exec);
@@ -376,7 +376,7 @@
     const ty = m.type[t];
     if (ty !== T.ROAD && !(ty === T.RAIL && m.road[t])) return ERR('No road here');
     const ro = m.rowner[t];
-    if (ro !== cid) return ERR('Owned by ' + ownerName(g, ro));
+    if (ro !== cid && ro !== HL.OWNER_NONE) return ERR('Owned by ' + ownerName(g, ro));
     if (B.bridgeOrTunnelAt(g, t)) return ERR('Remove the bridge or tunnel instead');
     if (HL.Road && HL.Road.tileOccupied(g, t)) return ERR('Vehicle in the way');
     const rem = rbits & m.road[t];
@@ -384,7 +384,7 @@
     const cost = Game.cost(g, C.removeRoad * bits(rem));
     if (exec) {
       m.road[t] &= ~rem;
-      inf(g, cid).road -= bits(rem) / 2;
+      if (ro === cid) inf(g, cid).road -= bits(rem) / 2;
       if (!m.road[t]) {
         if (ty === T.ROAD) { m.type[t] = T.CLEAR; m.owner[t] = HL.OWNER_NONE; m.ground[t] = GR.DIRT; m.gdens[t] = 0; }
         m.rowner[t] = HL.OWNER_NONE;
@@ -523,19 +523,20 @@
   };
   B.removeBridgeOrTunnel = function (g, cid, bt, exec) {
     const m = g.map;
-    if (bt.owner !== cid) return ERR('Owned by ' + ownerName(g, bt.owner));
+    if (bt.owner !== cid && bt.owner !== HL.OWNER_NONE) return ERR('Owned by ' + ownerName(g, bt.owner));
     if (HL.Veh && HL.Veh.onBridgeOrTunnel(g, bt)) return ERR('Vehicle in the way');
+    const mine = bt.owner === cid;
     const cost = Game.cost(g, 200 * (bt.len + 2));
     if (exec) {
       const isB = bt.kind === 'bridge';
       for (const t of [bt.a, bt.b]) {
         if (bt.transport === 'rail') { inf(g, cid).rail--; g.signals.delete(t * 6); g.signals.delete(t * 6 + 1); }
-        else inf(g, cid).road--;
+        else if (mine) inf(g, cid).road--;
         m.type[t] = T.CLEAR; m.owner[t] = HL.OWNER_NONE; m.idx[t] = -1; m.m1[t] = 0; m.rail[t] = 0; m.road[t] = 0; m.rowner[t] = HL.OWNER_NONE;
         m.ground[t] = GR.DIRT; m.mark(t);
       }
-      if (isB) { for (const t of B.spanTiles(g, bt)) { m.bridgeOver[t] = -1; m.mark(t); } inf(g, cid).bridgeTiles -= bt.len; g.bridges[bt.id] = null; }
-      else { inf(g, cid).tunnelTiles -= bt.len; g.tunnels[bt.id] = null; }
+      if (isB) { for (const t of B.spanTiles(g, bt)) { m.bridgeOver[t] = -1; m.mark(t); } if (mine) inf(g, cid).bridgeTiles -= bt.len; g.bridges[bt.id] = null; }
+      else { if (mine) inf(g, cid).tunnelTiles -= bt.len; g.tunnels[bt.id] = null; }
       g.blocksDirty = true;
     }
     return OK(cost);
@@ -642,15 +643,21 @@
     for (let t = 0; t < m.W * m.H; t++) {
       if (m.owner[t] !== cid && m.rowner[t] !== cid) continue;
       const k = m.type[t];
-      if (k === T.RAIL) { for (let p = 0; p < 6; p++) g.signals.delete(t * 6 + p); if (m.road[t] && m.rowner[t] !== cid) { m.type[t] = T.ROAD; m.rail[t] = 0; m.owner[t] = m.rowner[t]; } else { m.type[t] = T.CLEAR; m.rail[t] = 0; m.road[t] = 0; m.owner[t] = HL.OWNER_NONE; m.m1[t] = 0; m.idx[t] = -1; } }
-      else if (k === T.ROAD) { if (m.rowner[t] === cid) { m.road[t] = 0; m.type[t] = T.CLEAR; m.owner[t] = HL.OWNER_NONE; m.m1[t] = 0; m.idx[t] = -1; } }
+      if (k === T.RAIL) {
+        for (let p = 0; p < 6; p++) g.signals.delete(t * 6 + p);
+        if (m.owner[t] !== cid) { /* someone else's track over our road */ }
+        else if (m.road[t]) { m.type[t] = T.ROAD; m.rail[t] = 0; m.m1[t] = 0; m.idx[t] = -1; m.owner[t] = m.rowner[t] === cid ? HL.OWNER_NONE : m.rowner[t]; }
+        else { m.type[t] = T.CLEAR; m.rail[t] = 0; m.road[t] = 0; m.owner[t] = HL.OWNER_NONE; m.m1[t] = 0; m.idx[t] = -1; }
+      }
+      // roads stay behind as public roads: rivals and towns often drive on them
+      else if (k === T.ROAD) { if (m.owner[t] === cid) m.owner[t] = HL.OWNER_NONE; }
       else if (k === T.DEPOT) { const d = g.depots[m.idx[t]]; if (d) g.depots[d.id] = null; m.type[t] = d && d.kind === 2 ? T.WATER : T.CLEAR; m.idx[t] = -1; m.owner[t] = d && d.kind === 2 ? HL.OWNER_WATER : HL.OWNER_NONE; m.road[t] = 0; }
       else if (k === T.OBJECT) { const o = g.objects[m.idx[t]]; if (o && o.owner === cid) B.removeObject(g, o); }
       if (m.rowner[t] === cid) m.rowner[t] = HL.OWNER_NONE;
       m.mark(t);
     }
-    for (const b of g.bridges) if (b && b.owner === cid) { for (const t of B.spanTiles(g, b)) { m.bridgeOver[t] = -1; m.mark(t); } g.bridges[b.id] = null; }
-    for (const tn of g.tunnels) if (tn && tn.owner === cid) g.tunnels[tn.id] = null;
+    for (const b of g.bridges) if (b && b.owner === cid) { if (b.transport === 'road') { b.owner = HL.OWNER_NONE; continue; } for (const t of B.spanTiles(g, b)) { m.bridgeOver[t] = -1; m.mark(t); } g.bridges[b.id] = null; }
+    for (const tn of g.tunnels) if (tn && tn.owner === cid) { if (tn.transport === 'road') tn.owner = HL.OWNER_NONE; else g.tunnels[tn.id] = null; }
     for (const o of g.orders) if (o && o.owner === cid) g.orders[o.id] = null;
     if (g.infra) delete g.infra[cid];
     g.blocksDirty = true;

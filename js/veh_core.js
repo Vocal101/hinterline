@@ -396,11 +396,26 @@
     v.route = null;
     return { ok: true };
   };
+  // the depot we were heading for has no route from here (often one on another network):
+  // try the next nearest, and give up on a routine service rather than wander lost for ever
+  V.depotUnreachable = function (g, v) {
+    const gd = v.goDepot;
+    if (!gd || gd.hangar) return false;
+    const tried = gd.tried || (gd.tried = []);
+    if (!tried.includes(gd.depot)) tried.push(gd.depot);
+    const d = tried.length < 8 && V.nearestDepot(g, v, tried);
+    if (d) { gd.depot = d.id; return true; }
+    if (gd.service && !gd.stop) { v.goDepot = null; v.lastService = g.date; return true; }
+    // nowhere to go yet: start over in a month in case the roads or track get fixed
+    gd.retryAt = gd.retryAt || g.date + 30;
+    if (g.date >= gd.retryAt) { gd.tried = []; gd.retryAt = 0; const n = V.nearestDepot(g, v); if (n) gd.depot = n.id; }
+    return false;
+  };
   // nearest depot of the right kind by straight distance (path checked by movement code)
-  V.nearestDepot = function (g, v) {
+  V.nearestDepot = function (g, v, skip) {
     let best = null, bd = 1e9;
     for (const d of g.depots) {
-      if (!d || d.owner !== v.owner || !V.depotKindOk(v, d)) continue;
+      if (!d || d.owner !== v.owner || !V.depotKindOk(v, d) || (skip && skip.includes(d.id))) continue;
       if (v.kind === 'rail' && !HL.railCompatible(v.rt === 1 ? 1 : HL.VEH[v.model].rt, d.rt) && !(HL.VEH[v.model].rt === 0 && d.rt === 1)) continue;
       const dd = HL.manh(v.px, v.py, d.x, d.y);
       if (dd < bd) { bd = dd; best = d; }

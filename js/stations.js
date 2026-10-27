@@ -436,7 +436,7 @@
         if (m.type[t] === T.STATION && m.idx[t] === st.id) {
           const k = S.kindAt(m, t);
           if (k === K.BUOY) { m.type[t] = T.WATER; m.owner[t] = HL.OWNER_WATER; m.idx[t] = -1; m.m1[t] = 0; m.mark(t); }
-          else if ((k === K.BUS || k === K.TRUCK) && m.rowner[t] !== st.owner) { m.type[t] = T.ROAD; m.idx[t] = -1; m.m1[t] = 0; m.owner[t] = m.rowner[t]; m.mark(t); }
+          else if ((k === K.BUS || k === K.TRUCK) && m.road[t]) { if (m.rowner[t] === st.owner) m.rowner[t] = HL.OWNER_NONE; m.type[t] = T.ROAD; m.idx[t] = -1; m.m1[t] = 0; m.owner[t] = m.rowner[t]; m.mark(t); }
           else clearStationTile(g, t);
         }
       }
